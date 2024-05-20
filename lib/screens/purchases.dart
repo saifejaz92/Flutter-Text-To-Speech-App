@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
-const List<String> testID = ['test_id', "test_id2"];
+const List<String> testID = ['basic', "premium"];
 
 class Purchase extends StatefulWidget {
   const Purchase({Key? key}) : super(key: key);
@@ -100,12 +100,6 @@ class _PurchaseState extends State<Purchase> {
   void initState() {
     _initialize();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _subscription!.cancel();
-    super.dispose();
   }
 
   @override
