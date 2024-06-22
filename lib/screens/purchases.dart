@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
-const List<String> testID = ['basic', "premium"];
+const List<String> testID = ['basic', "standard"];
 
 class Purchase extends StatefulWidget {
   const Purchase({Key? key}) : super(key: key);
@@ -92,8 +93,12 @@ class _PurchaseState extends State<Purchase> {
   }
 
   void _buyProduct(ProductDetails prod) {
-    final PurchaseParam purchaseParam = PurchaseParam(productDetails: prod);
-    _iap.buyConsumable(purchaseParam: purchaseParam, autoConsume: false);
+    try {
+      final PurchaseParam purchaseParam = PurchaseParam(productDetails: prod);
+      _iap.buyConsumable(purchaseParam: purchaseParam, autoConsume: false);
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Something Went Wrong");
+    }
   }
 
   @override
@@ -109,61 +114,63 @@ class _PurchaseState extends State<Purchase> {
         title:
             Text(_isAvailable ? 'Product Available' : 'No Product Available'),
       ),
-      body: Center(
-        child: Column(
-          children: _products.map((product) {
-            final hasPurchased = _hasUserPurchased(product.id).status ==
-                PurchaseStatus.purchased;
+      body: _isAvailable
+          ? SingleChildScrollView(
+              child: Column(
+                children: _products.map((product) {
+                  final hasPurchased = _hasUserPurchased(product.id).status ==
+                      PurchaseStatus.purchased;
 
-            return Card(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 8, left: 8, right: 8, bottom: 15),
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 5,
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 8, left: 8, right: 8, bottom: 15),
+                      child: Column(
+                        children: [
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          const CircleAvatar(
+                            child: Icon(Icons.shopping_cart),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          if (hasPurchased) ...[
+                            Text(
+                              product.description,
+                              style: const TextStyle(fontSize: 30),
+                            ),
+                          ] else ...[
+                            Text(
+                              product.title,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 17),
+                            ),
+                            Text(
+                              product.price,
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            const Text("Validity 1 Month"),
+                            ListTile(
+                              title: Text(product.description),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => _buyProduct(product),
+                              child: const Text('Buy'),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
-                    const CircleAvatar(
-                      child: Icon(Icons.shopping_cart),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    if (hasPurchased) ...[
-                      Text(
-                        product.description,
-                        style: const TextStyle(fontSize: 30),
-                      ),
-                    ] else ...[
-                      Text(
-                        product.title,
-                      ),
-                      Text(product.description),
-                      Text(
-                        product.price,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const Text("Validity 1 Month"),
-                      ListTile(
-                        leading: const Icon(
-                          Icons.check_box_rounded,
-                          color: Colors.green,
-                        ),
-                        title: Text(product.description),
-                      ),
-                      ElevatedButton(
-                        onPressed: () => _buyProduct(product),
-                        child: const Text('Buy'),
-                      ),
-                    ],
-                  ],
-                ),
+                  );
+                }).toList(),
               ),
-            );
-          }).toList(),
-        ),
-      ),
+            )
+          : const Center(child: CircularProgressIndicator()),
     );
   }
 }

@@ -4,7 +4,7 @@ final Color blueColor = Color(0xFF1565C0);
 final Color greyColor = Colors.grey.shade700;
 int freeUserWordslimit = 2500;
 int basicUserWordLimit = 500000;
-int standardUserWordsLimit = 100000;
+int standardUserWordsLimit = 1020000;
 List voiceNames = [
   "Anny",
   "Mikel",
